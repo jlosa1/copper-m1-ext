@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { PlanPicker } from "@/components/copper/plan-picker";
+import { ProductSlider } from "@/components/copper/product-slider";
 import { SiteFooter } from "@/components/copper/site-footer";
 import { SiteHeader } from "@/components/copper/site-header";
 import { Badge } from "@/components/ui/badge";
@@ -41,8 +42,30 @@ const LIFESTYLE_COPY: Record<
   },
 };
 
+// One-line captions for the slider's single-product slides.
+const SLIDE_CAPTIONS: Record<string, string> = {
+  "copper-home": "Copper Home keeps the house running.",
+  "copper-notes": "Copper Notes catches every conversation.",
+};
+
 export default function Home() {
   const products = getProducts();
+  const cutoutImage = (product: (typeof products)[number]) => ({
+    src: product.cutout,
+    alt: `${product.name} ${product.type} in ${product.colors[0]}`,
+  });
+  const slides = [
+    {
+      id: "both",
+      caption: "Two helpers, one Copper family.",
+      images: products.map(cutoutImage),
+    },
+    ...products.map((product) => ({
+      id: product.id,
+      caption: SLIDE_CAPTIONS[product.id] ?? product.name,
+      images: [cutoutImage(product)],
+    })),
+  ];
   const plans = getPlans();
   const privacy = getPrivacySummary();
   const showcaseItems = products.flatMap((product) =>
@@ -56,6 +79,7 @@ export default function Home() {
     <>
       <SiteHeader />
       <main className="flex-1">
+        <ProductSlider slides={slides} />
         <section
           data-testid="hero"
           id="top"
